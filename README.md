@@ -1,8 +1,9 @@
 # Memory Corruption Lab (C++)
 
-This repository demonstrates common memory safety issues in C/C++ using small practical examples.
+## Overview
+This repository contains practical examples of common memory corruption vulnerabilities in C/C++, along with debugging techniques and secure fixes.
 
-
+It is designed as a hands-on lab to understand both exploitation concepts and defensive programming practices.
 
 ## Topics covered
 
@@ -170,7 +171,7 @@ previously allocated by thread T0 here:
 SUMMARY: AddressSanitizer: heap-use-after-free constexpr_c_functions.h:63 in unsigned long std::__1::__constexpr_strlen[abi:ne200100]<char>(char const*)
 
 ASAN provides:
-- precise error detection
+- precise error detection(heap-buffer-overflow, use-after-free,  out-of-bounds access)
 - memory access tracking
 - immediate program termination on invalid access
 
@@ -190,7 +191,7 @@ bt
 ### Sample output
 
 (lldb) run
-Process 35470 launched: '/Users/surabhi.vyas/stack_overflow' (arm64)
+Process 35470 launched: '/stack_overflow'
 
 address of buffer: 0x16fdff140
 
@@ -229,17 +230,57 @@ Target 0: (stack_overflow) stopped.
 
 LLDB helps in:
 - inspecting stack frames
-- identifying control flow corruption
+- identifying control flow corruption/invalid memory access
 - analyzing crash behavior
-
 
 ## Why this matters
 These examples show how memory corruption bugs behave in practice and how runtime tooling helps detect them early during development.
 
-## Mitigation strategies
+## Fixed Implementations
 
-- Use bounds-checked functions
-- Prefer smart pointers over raw pointers
-- Set pointers to NULL after free
-- Use sanitizers during development
-- Avoid manual memory management when possible
+Each vulnerability has a corresponding fixed version demonstrating safer coding practices.
+
+- `stack_overflow_fixed.cpp`
+- Uses `std::string` instead of fixed-size buffers
+- Enforces input length checks
+
+- `heap_overflow_fixed.cpp`
+- Uses bounded writes (`snprintf`)
+- Prevents overwriting adjacent memory
+
+- `heap_overflow_fixed_input.cpp`
+- Uses safe input handling (`fgets`)
+- Avoids uncontrolled user input overflow
+
+- `uaf_demo_fixed.cpp`
+- Avoids accessing memory after `free`
+- Invalidates pointer using `nullptr`
+
+- `uaf_demo_smart_ptr.cpp`
+- Uses `std::unique_ptr` for automatic memory management
+- Demonstrates safer ownership model
+
+## Mitigation Strategies
+
+Key defensive techniques demonstrated in this lab:
+
+- enforce strict bounds checking on buffers
+- use safer APIs (`fgets`, `snprintf`)
+- avoid unsafe functions like `gets` and unchecked `strcpy`
+- never access memory after it has been freed
+- invalidate pointers after `free`
+- prefer smart pointers in modern C++
+- validate input sizes before allocation
+- use runtime tools like AddressSanitizer (ASAN)
+- use debugging tools like LLDB for crash analysis
+
+## Learning Outcomes
+
+This lab demonstrates:
+
+- how memory corruption vulnerabilities occur
+- how they impact program behavior and security
+- how to detect them using modern tools
+- how to fix them using safe coding practices
+- how to apply defensive programming in C/C++
+
