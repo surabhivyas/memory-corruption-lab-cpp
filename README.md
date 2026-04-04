@@ -11,6 +11,7 @@ It is designed as a hands-on lab to understand both exploitation concepts and de
 - Heap overflow
 - Use-after-free (UAF)
 - Heap allocation reuse / heap shaping
+- Integer overflow
 - Detection with AddressSanitizer (ASAN)
 - Debugging with LLDB
 
@@ -30,6 +31,7 @@ clang++ -fsanitize=address -g -O0 heap_overflow.cpp -o heap_overflow_asan
 - `heap_overflow.cpp` — demonstrates and analyzes corruption of adjacent heap allocation
 - `uaf_demo.cpp` — demonstrates use-after-free and dangling pointer behavior
 - `heap_control.cpp` — demonstrates heap reuse / heap shaping
+- `integer_overflow.cpp` - demonstrates overflow in allocation size calculation
 
 ## Key observations
 
@@ -59,6 +61,12 @@ clang++ -fsanitize=address -g -O0 heap_overflow.cpp -o heap_overflow_asan
 ### Heap shaping
 - Allocation and free order influences memory reuse
 - Specific objects can be placed in targeted heap locations
+
+### Integer overflow
+- Arithmetic overflow during size calculation can result in incorrect memory allocation
+- Multiplication like `count * sizeof(int)` may wrap around if input is too large
+- Overflow can produce undersized allocations (e.g., 0 bytes)
+- It can silently break memory allocation logic and lead to serious vulnerabilities like heap overflow.
 
 ## ASAN
 AddressSanitizer was used to detect:
@@ -260,6 +268,9 @@ Each vulnerability has a corresponding fixed version demonstrating safer coding 
 - Uses `std::unique_ptr` for automatic memory management
 - Demonstrates safer ownership model
 
+- `integer_overflow_fixed.cpp`
+- validate allocation size to prevent integer overflow during multiplication
+
 ## Mitigation Strategies
 
 Key defensive techniques demonstrated in this lab:
@@ -270,7 +281,7 @@ Key defensive techniques demonstrated in this lab:
 - never access memory after it has been freed
 - invalidate pointers after `free`
 - prefer smart pointers in modern C++
-- validate input sizes before allocation
+- validate input sizes and prevent integer overflow during allocation
 - use runtime tools like AddressSanitizer (ASAN)
 - use debugging tools like LLDB for crash analysis
 
@@ -280,6 +291,7 @@ This lab demonstrates:
 
 - how memory corruption vulnerabilities occur
 - how they impact program behavior and security
+- Understanding how integer overflow can lead to unsafe memory allocation
 - how to detect them using modern tools
 - how to fix them using safe coding practices
 - how to apply defensive programming in C/C++
